@@ -1,4 +1,4 @@
-package puzzle.engine;
+package main;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import com.networknt.schema.ValidationMessage;
 public class PuzzleEngine {
     public enum Dificuldade { EASY, NORMAL, HARD, EXPERT }
 
-    static final int MAXS = 30;
+    static final int MAXS = 100; // Aumentado para suportar puzzles maiores (como 34x13)
     static final int PESO_1 = 3;
     static final int PESO_2 = 5;
     static final int PESO_3T = 5;
@@ -614,7 +614,7 @@ public class PuzzleEngine {
 	 * @param p Matriz do puzzle.
 	 * @return Total de pistas presentes.
 	 */
-	private int contarPistas(int[][] p) {
+	public int contarPistas(int[][] p) {
 		int count = 0;
 		for (int i = 0; i < linhas; i++) {
 			for (int j = 0; j < colunas; j++) {
@@ -731,7 +731,7 @@ public class PuzzleEngine {
 		Map<String, Object> export = new LinkedHashMap<>();
 		
 		Map<String, Object> metadata = new LinkedHashMap<>();
-		metadata.put("dificuldade", lastNivel != null ? lastNivel.name() : "UNKNOWN");
+		metadata.put("dificuldade", lastNivel != null ? lastNivel.name().toUpperCase() : "UNKNOWN");
 		metadata.put("seed", lastSeed);
 		metadata.put("densidade_dicas", (double)contarPistas(puzzle) / (linhas * colunas));
 		metadata.put("tamanho", Map.of("linhas", linhas, "colunas", colunas));
@@ -776,7 +776,7 @@ public class PuzzleEngine {
 		String jsonDir = "json";
 		Files.createDirectories(Paths.get(jsonDir)); // Cria o diretório se não existir
 
-		String filename = String.format("puzzle_%dx%d_seed%d_dificuldade%s.json", l, c, seed, nivel.name());
+		String filename = String.format("puzzle_%s_%d_%dx%d.json", nivel.name().toLowerCase(), seed, l, c);
 		File outputFile = new File(jsonDir, filename);
 
 		// 5. Escrever o Map para o arquivo JSON
@@ -1390,7 +1390,7 @@ class SquareBoard {
 	}
 	
 	void print(java.io.PrintStream out) {
-		char[] buffer = new char[420];
+		char[] buffer = new char[MAXS * 4 + 50]; // Buffer dinâmico baseado no limite máximo
 		String line, b1, b2;
 		int i, len = c * 4 + 5;
 		for(i = 0; i < len; i++)
